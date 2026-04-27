@@ -72,13 +72,11 @@ export interface ChatCompletionCreateParamsBase {
   max_tokens?: number;
 }
 
-export interface ChatCompletionCreateParamsNonStreaming
-  extends ChatCompletionCreateParamsBase {
+export interface ChatCompletionCreateParamsNonStreaming extends ChatCompletionCreateParamsBase {
   stream?: false;
 }
 
-export interface ChatCompletionCreateParamsStreaming
-  extends ChatCompletionCreateParamsBase {
+export interface ChatCompletionCreateParamsStreaming extends ChatCompletionCreateParamsBase {
   stream: true;
   stream_options?: ChatCompletionStreamOptions;
 }
@@ -87,8 +85,7 @@ export type ChatCompletionCreateParams =
   | ChatCompletionCreateParamsNonStreaming
   | ChatCompletionCreateParamsStreaming;
 
-export interface ChatCompletionStreamParams
-  extends ChatCompletionCreateParamsBase {
+export interface ChatCompletionStreamParams extends ChatCompletionCreateParamsBase {
   stream_options?: ChatCompletionStreamOptions;
 }
 

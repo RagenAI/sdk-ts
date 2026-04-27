@@ -29,7 +29,12 @@ export class RagenError extends Error {
 export class RagenAuthError extends RagenError {
   constructor(
     message: string,
-    options: { status: number; code?: string | null; param?: string | null; type?: string },
+    options: {
+      status: number;
+      code?: string | null;
+      param?: string | null;
+      type?: string;
+    },
   ) {
     super(message, options);
     this.name = "RagenAuthError";
@@ -40,7 +45,12 @@ export class RagenAuthError extends RagenError {
 export class RagenPermissionError extends RagenError {
   constructor(
     message: string,
-    options: { status: number; code?: string | null; param?: string | null; type?: string },
+    options: {
+      status: number;
+      code?: string | null;
+      param?: string | null;
+      type?: string;
+    },
   ) {
     super(message, options);
     this.name = "RagenPermissionError";
@@ -51,7 +61,12 @@ export class RagenPermissionError extends RagenError {
 export class RagenNotFoundError extends RagenError {
   constructor(
     message: string,
-    options: { status: number; code?: string | null; param?: string | null; type?: string },
+    options: {
+      status: number;
+      code?: string | null;
+      param?: string | null;
+      type?: string;
+    },
   ) {
     super(message, options);
     this.name = "RagenNotFoundError";
@@ -62,7 +77,12 @@ export class RagenNotFoundError extends RagenError {
 export class RagenRateLimitError extends RagenError {
   constructor(
     message: string,
-    options: { status: number; code?: string | null; param?: string | null; type?: string },
+    options: {
+      status: number;
+      code?: string | null;
+      param?: string | null;
+      type?: string;
+    },
   ) {
     super(message, options);
     this.name = "RagenRateLimitError";
@@ -73,7 +93,12 @@ export class RagenRateLimitError extends RagenError {
 export class RagenAPIError extends RagenError {
   constructor(
     message: string,
-    options: { status: number; code?: string | null; param?: string | null; type?: string },
+    options: {
+      status: number;
+      code?: string | null;
+      param?: string | null;
+      type?: string;
+    },
   ) {
     super(message, options);
     this.name = "RagenAPIError";

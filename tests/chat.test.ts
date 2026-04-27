@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  Ragen,
-  RagenAuthError,
-  RagenError,
-  RagenRateLimitError,
-} from "../src";
+import { Ragen, RagenAuthError, RagenError, RagenRateLimitError } from "../src";
 import { makeFetchMock, mockResponse } from "./helpers";
 
 const completion = {

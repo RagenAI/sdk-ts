@@ -41,15 +41,21 @@ describe("assistants", () => {
     const { fetch, calls } = makeFetchMock([mockResponse({ body: assistant })]);
     const ragen = new Ragen({ apiKey: "sk_test", fetch });
     await ragen.assistants.retrieve("22222222-2222-4222-8222-222222222222");
-    expect(calls[0]!.url).toBe("https://api.ragen.ai/v1/assistants/22222222-2222-4222-8222-222222222222");
+    expect(calls[0]!.url).toBe(
+      "https://api.ragen.ai/v1/assistants/22222222-2222-4222-8222-222222222222",
+    );
     expect(calls[0]!.init.method).toBe("GET");
   });
 
   it("update sends POST to /assistants/{id}", async () => {
     const { fetch, calls } = makeFetchMock([mockResponse({ body: assistant })]);
     const ragen = new Ragen({ apiKey: "sk_test", fetch });
-    await ragen.assistants.update("22222222-2222-4222-8222-222222222222", { name: "Renamed" });
-    expect(calls[0]!.url).toBe("https://api.ragen.ai/v1/assistants/22222222-2222-4222-8222-222222222222");
+    await ragen.assistants.update("22222222-2222-4222-8222-222222222222", {
+      name: "Renamed",
+    });
+    expect(calls[0]!.url).toBe(
+      "https://api.ragen.ai/v1/assistants/22222222-2222-4222-8222-222222222222",
+    );
     expect(calls[0]!.init.method).toBe("POST");
     expect(JSON.parse(calls[0]!.init.body as string)).toEqual({ name: "Renamed" });
   });
@@ -57,7 +63,11 @@ describe("assistants", () => {
   it("delete returns delete envelope", async () => {
     const { fetch } = makeFetchMock([
       mockResponse({
-        body: { id: "22222222-2222-4222-8222-222222222222", object: "assistant.deleted", deleted: true },
+        body: {
+          id: "22222222-2222-4222-8222-222222222222",
+          object: "assistant.deleted",
+          deleted: true,
+        },
       }),
     ]);
     const ragen = new Ragen({ apiKey: "sk_test", fetch });

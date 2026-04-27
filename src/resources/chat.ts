@@ -33,10 +33,11 @@ function buildBody(
 ): Record<string, unknown> {
   const assistantId = params.assistantId ?? defaultAssistantId;
   if (!assistantId) {
-    throw new RagenError(
-      "assistantId is required (pass per-call or set on the client)",
-      { status: 0, type: "invalid_request_error", param: "assistantId" },
-    );
+    throw new RagenError("assistantId is required (pass per-call or set on the client)", {
+      status: 0,
+      type: "invalid_request_error",
+      param: "assistantId",
+    });
   }
   const body: Record<string, unknown> = {
     assistant_id: assistantId,

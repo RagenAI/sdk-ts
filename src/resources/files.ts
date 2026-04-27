@@ -130,10 +130,10 @@ export class Files {
         );
       }
       if (Date.now() - start >= timeout) {
-        throw new RagenError(
-          `Timed out waiting for file ${id} to finish processing`,
-          { status: 0, type: "timeout" },
-        );
+        throw new RagenError(`Timed out waiting for file ${id} to finish processing`, {
+          status: 0,
+          type: "timeout",
+        });
       }
       await sleep(interval);
       interval = Math.min(interval * 2, maxInterval);
