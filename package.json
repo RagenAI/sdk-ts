@@ -4,7 +4,7 @@
   "description": "TypeScript SDK for Ragen.ai — EU-native RAG platform",
   "license": "MIT",
   "author": "Ragen.ai <support@ragen.ai>",
-  "homepage": "https://github.com/ragenai/ragenai",
+  "homepage": "https://github.com/ragenai/sdk-ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ragenai/sdk-ts.git"
