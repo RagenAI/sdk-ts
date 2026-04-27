@@ -1,0 +1,66 @@
+{
+  "name": "@ragenai/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Ragen.ai — EU-native RAG platform",
+  "license": "MIT",
+  "author": "Ragen.ai <support@ragen.ai>",
+  "homepage": "https://github.com/ragenai/ragenai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ragenai/sdk-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ragenai/sdk-ts/issues"
+  },
+  "keywords": [
+    "ragen",
+    "rag",
+    "ai",
+    "llm",
+    "openai-compatible",
+    "sdk",
+    "gdpr",
+    "eu"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"examples/**/*.ts\"",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
