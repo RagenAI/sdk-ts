@@ -83,6 +83,47 @@ await ragen.chat.completions.create({
 });
 ```
 
+### Chat — Ragen's native endpoint
+
+`chat.completions.*` above is OpenAI-compatible, and it's what you want
+for most integrations. `chat.send*` targets Ragen's own `POST /v1/chat`
+instead, which takes two things the OpenAI wire format has no room for:
+
+- **`context`** — up to 20,000 characters of extra page or document
+  text, appended to the question server-side. Built for embedded
+  chatbots that pass along whatever page the visitor is reading.
+- **separated reasoning** — on a stream, the model's intermediate
+  thinking arrives as its own event type instead of being mixed into
+  the answer.
+
+```ts
+const { text } = await ragen.chat.send({
+  content: "What is our refund policy?",
+  context: document.body.innerText,
+});
+```
+
+Streaming yields tagged events, so switch on `type` rather than
+concatenating everything — otherwise the reasoning ends up inside your
+answer:
+
+```ts
+for await (const event of ragen.chat.sendStream({
+  content: "Why was my order delayed?",
+  reasoning_effort: "medium",
+})) {
+  if (event.type === "text") process.stdout.write(event.text);
+  else console.debug("[thinking]", event.reasoning);
+}
+
+// Convenience: answer text only, reasoning dropped.
+const answer = await ragen.chat.sendToString({ content: "Summarize this" });
+```
+
+`reasoning_effort` (`"low" | "medium" | "high"`) works on
+`chat.completions.*` too. Only reasoning-capable models act on it;
+those default to `"medium"` server-side.
+
 ### Files
 
 ```ts
@@ -112,13 +153,32 @@ const assistant = await ragen.assistants.create({
   instructions: "Be concise.",
 });
 
-const all = await ragen.assistants.list();
+// The API pages at 20 by default — pass limit/after to see the rest.
+const all = await ragen.assistants.list({ limit: 100 });
 const a = await ragen.assistants.retrieve(assistant.id);
 const updated = await ragen.assistants.update(assistant.id, {
   name: "Support Bot v2",
 });
 await ragen.assistants.delete(assistant.id);
 ```
+
+### Threads
+
+Thread and message CRUD on `/v1/threads` follows the OpenAI Assistants
+API, so the official OpenAI SDK already handles it against a Ragen base
+URL — this SDK doesn't duplicate it. The one exception is **listing**
+threads, which isn't in the OpenAI spec at all:
+
+```ts
+const { data } = await ragen.threads.list({ limit: 50, order: "desc" });
+
+// Or page through every thread in the org:
+for await (const thread of ragen.threads.iterate()) {
+  console.log(thread.id, thread.title, thread.assistant_id);
+}
+```
+
+`title` and `assistant_id` are Ragen extensions on the thread object.
 
 ## Error handling
 
@@ -159,14 +219,14 @@ The SDK automatically retries on **429** and **5xx** responses with exponential 
 
 ## Configuration
 
-| Option        | Type           | Default                       | Description                                                                |
-| ------------- | -------------- | ----------------------------- | -------------------------------------------------------------------------- |
-| `apiKey`      | `string`       | `process.env.RAGEN_API_KEY`   | API key. Required.                                                         |
-| `assistantId` | `string`       | —                             | Default `assistant_id` to use when one is not passed per-call.             |
-| `baseURL`     | `string`       | `https://api.ragen.ai/v1`     | API base URL. Override for self-hosted deployments.                        |
-| `maxRetries`  | `number`       | `2`                           | Retry attempts on 429/5xx and transient errors.                            |
-| `timeout`     | `number` (ms)  | `30000`                       | Per-request timeout.                                                       |
-| `fetch`       | `typeof fetch` | `globalThis.fetch`            | Custom `fetch` implementation (e.g. for testing or polyfills).             |
+| Option        | Type           | Default                     | Description                                                    |
+| ------------- | -------------- | --------------------------- | -------------------------------------------------------------- |
+| `apiKey`      | `string`       | `process.env.RAGEN_API_KEY` | API key. Required.                                             |
+| `assistantId` | `string`       | —                           | Default `assistant_id` to use when one is not passed per-call. |
+| `baseURL`     | `string`       | `https://api.ragen.ai/v1`   | API base URL. Override for self-hosted deployments.            |
+| `maxRetries`  | `number`       | `2`                         | Retry attempts on 429/5xx and transient errors.                |
+| `timeout`     | `number` (ms)  | `30000`                     | Per-request timeout.                                           |
+| `fetch`       | `typeof fetch` | `globalThis.fetch`          | Custom `fetch` implementation (e.g. for testing or polyfills). |
 
 ## Examples
 

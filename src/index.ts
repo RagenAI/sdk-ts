@@ -17,7 +17,13 @@ export type {
   ChatCompletionMessage,
   ChatCompletionMessageParam,
   ChatCompletionStreamParams,
+  ChatSendParams,
+  ChatSendResponse,
+  ChatStreamEvent,
 } from "./resources/chat";
+
+export { Threads } from "./resources/threads";
+export type { Thread, ThreadListParams, ThreadListResponse } from "./resources/threads";
 
 export { Files } from "./resources/files";
 export type { UploadFileInput } from "./resources/files";
@@ -26,6 +32,7 @@ export type {
   FileListParams,
   FileListResponse,
   FileObject,
+  FilePurpose,
   FileStatus,
   FileUploadParams,
   WaitUntilProcessedOptions,
@@ -36,6 +43,7 @@ export type {
   Assistant,
   AssistantCreateParams,
   AssistantDeletedResponse,
+  AssistantListParams,
   AssistantListResponse,
   AssistantUpdateParams,
 } from "./resources/assistants";
@@ -53,6 +61,7 @@ export type {
   ChatCompletionRole,
   ChatCompletionUsage,
   ChatCompletionStreamOptions,
+  ReasoningEffort,
   APIErrorBody,
 } from "./types";
 

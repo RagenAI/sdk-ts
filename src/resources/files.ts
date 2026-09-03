@@ -17,6 +17,7 @@ export type {
   FileListParams,
   FileListResponse,
   FileObject,
+  FilePurpose,
   FileStatus,
   FileUploadParams,
   WaitUntilProcessedOptions,

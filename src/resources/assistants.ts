@@ -2,6 +2,7 @@ import type {
   Assistant,
   AssistantCreateParams,
   AssistantDeletedResponse,
+  AssistantListParams,
   AssistantListResponse,
   AssistantUpdateParams,
 } from "../types";
@@ -11,6 +12,7 @@ export type {
   Assistant,
   AssistantCreateParams,
   AssistantDeletedResponse,
+  AssistantListParams,
   AssistantListResponse,
   AssistantUpdateParams,
 } from "../types";
@@ -37,11 +39,26 @@ export class Assistants {
     return readJson<Assistant>(response);
   }
 
-  /** List all assistants in the organization. */
-  async list(options?: { signal?: AbortSignal }): Promise<AssistantListResponse> {
+  /**
+   * List assistants in the organization.
+   *
+   * The API pages at 20 by default, so pass `limit` (max 100) and
+   * `after` to reach the rest — an org with more than 20 assistants
+   * will otherwise look truncated.
+   */
+  async list(
+    params: AssistantListParams = {},
+    options?: { signal?: AbortSignal },
+  ): Promise<AssistantListResponse> {
     const response = await performRequest(this.config.http, {
       method: "GET",
       path: "/assistants",
+      query: {
+        limit: params.limit,
+        order: params.order,
+        after: params.after,
+        before: params.before,
+      },
       signal: options?.signal,
     });
     return readJson<AssistantListResponse>(response);

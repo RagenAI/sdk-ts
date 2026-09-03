@@ -3,11 +3,15 @@ import type { ChatCompletionChunk } from "./types";
 
 /**
  * Convert a Server-Sent Events response body into an async iterable of
- * `ChatCompletionChunk` objects. Terminates on `data: [DONE]`.
+ * decoded `data:` payloads. Terminates on `data: [DONE]`.
+ *
+ * Generic over the payload because Ragen streams two different shapes:
+ * `chat.completion.chunk` objects on `/v1/chat/completions`, and
+ * `{ text }` / `{ reasoning }` objects on `/v1/chat`.
  */
-export async function* parseSSEStream(
+export async function* parseSSEStream<T = ChatCompletionChunk>(
   response: Response,
-): AsyncGenerator<ChatCompletionChunk, void, void> {
+): AsyncGenerator<T, void, void> {
   if (!response.body) {
     throw new RagenError("Streaming response has no body", {
       status: response.status,
@@ -31,7 +35,7 @@ export async function* parseSSEStream(
       while ((separatorIndex = indexOfDoubleNewline(buffer)) !== -1) {
         const rawEvent = buffer.slice(0, separatorIndex);
         buffer = buffer.slice(separatorIndex + (buffer[separatorIndex] === "\r" ? 4 : 2));
-        const chunk = parseEvent(rawEvent);
+        const chunk = parseEvent<T>(rawEvent);
         if (chunk === "DONE") return;
         if (chunk !== null) yield chunk;
       }
@@ -39,7 +43,7 @@ export async function* parseSSEStream(
     // Flush any final event without trailing blank line.
     const tail = buffer.trim();
     if (tail) {
-      const chunk = parseEvent(tail);
+      const chunk = parseEvent<T>(tail);
       if (chunk !== "DONE" && chunk !== null) yield chunk;
     }
   } finally {
@@ -55,7 +59,7 @@ function indexOfDoubleNewline(buffer: string): number {
   return Math.min(lf, crlf);
 }
 
-function parseEvent(raw: string): ChatCompletionChunk | "DONE" | null {
+function parseEvent<T>(raw: string): T | "DONE" | null {
   const lines = raw.split(/\r?\n/);
   const dataLines: string[] = [];
   for (const line of lines) {
@@ -68,7 +72,7 @@ function parseEvent(raw: string): ChatCompletionChunk | "DONE" | null {
   const payload = dataLines.join("\n");
   if (payload === "[DONE]") return "DONE";
   try {
-    return JSON.parse(payload) as ChatCompletionChunk;
+    return JSON.parse(payload) as T;
   } catch {
     return null;
   }

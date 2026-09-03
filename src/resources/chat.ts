@@ -7,6 +7,9 @@ import type {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionCreateParamsStreaming,
   ChatCompletionStreamParams,
+  ChatSendParams,
+  ChatSendResponse,
+  ChatStreamEvent,
 } from "../types";
 import { performRequest, readJson, type FetchClientConfig } from "../utils";
 
@@ -19,6 +22,9 @@ export type {
   ChatCompletionMessage,
   ChatCompletionMessageParam,
   ChatCompletionStreamParams,
+  ChatSendParams,
+  ChatSendResponse,
+  ChatStreamEvent,
 } from "../types";
 
 interface ChatResourceConfig {
@@ -47,7 +53,29 @@ function buildBody(
   if (params.model !== undefined) body.model = params.model;
   if (params.temperature !== undefined) body.temperature = params.temperature;
   if (params.max_tokens !== undefined) body.max_tokens = params.max_tokens;
+  if (params.max_completion_tokens !== undefined) {
+    body.max_completion_tokens = params.max_completion_tokens;
+  }
+  if (params.reasoning_effort !== undefined) {
+    body.reasoning_effort = params.reasoning_effort;
+  }
   return body;
+}
+
+/**
+ * Normalize one `/v1/chat` SSE payload. The endpoint emits bare
+ * `{ text }` and `{ reasoning }` objects; we tag them so callers can
+ * tell the answer from the model's thinking without probing keys.
+ */
+function toStreamEvent(raw: {
+  text?: unknown;
+  reasoning?: unknown;
+}): ChatStreamEvent | null {
+  if (typeof raw.text === "string") return { type: "text", text: raw.text };
+  if (typeof raw.reasoning === "string") {
+    return { type: "reasoning", reasoning: raw.reasoning };
+  }
+  return null;
 }
 
 /** `chat.completions` resource — OpenAI-compatible chat completions over Ragen's RAG. */
@@ -143,11 +171,121 @@ export class ChatCompletions {
   }
 }
 
-/** Namespace wrapper so the call site reads `client.chat.completions.create(...)`. */
+/**
+ * `chat` resource. Two endpoints live here:
+ *
+ *  - `chat.completions.*` — OpenAI-compatible `/v1/chat/completions`.
+ *    Use this for anything new.
+ *  - `chat.send*` — Ragen's own `/v1/chat`. Kept because `context` and
+ *    separated reasoning deltas have no OpenAI-compatible equivalent.
+ */
 export class Chat {
   readonly completions: ChatCompletions;
 
-  constructor(config: ChatResourceConfig) {
+  constructor(private readonly config: ChatResourceConfig) {
     this.completions = new ChatCompletions(config);
+  }
+
+  private buildChatBody(
+    params: ChatSendParams,
+    stream: boolean,
+  ): Record<string, unknown> {
+    const assistantId = params.assistantId ?? this.config.defaultAssistantId;
+    if (!assistantId) {
+      throw new RagenError(
+        "assistantId is required (pass per-call or set on the client)",
+        { status: 0, type: "invalid_request_error", param: "assistantId" },
+      );
+    }
+    const body: Record<string, unknown> = {
+      assistant_id: assistantId,
+      content: params.content,
+      stream,
+    };
+    if (params.context !== undefined) body.context = params.context;
+    if (params.reasoning_effort !== undefined) {
+      body.reasoning_effort = params.reasoning_effort;
+    }
+    return body;
+  }
+
+  /**
+   * Send one message to `POST /v1/chat` and get the whole answer back.
+   *
+   * @example
+   * ```ts
+   * const { text } = await ragen.chat.send({
+   *   content: "What is our refund policy?",
+   *   context: document.body.innerText,
+   * });
+   * ```
+   */
+  async send(
+    params: ChatSendParams,
+    options?: { signal?: AbortSignal },
+  ): Promise<ChatSendResponse> {
+    const response = await performRequest(this.config.http, {
+      method: "POST",
+      path: "/chat",
+      body: this.buildChatBody(params, false),
+      signal: options?.signal,
+    });
+    return readJson<ChatSendResponse>(response);
+  }
+
+  /**
+   * Stream a `POST /v1/chat` response as tagged events.
+   *
+   * Reasoning deltas arrive interleaved with answer text on the same
+   * stream, so switch on `event.type` rather than concatenating
+   * everything — otherwise the model's thinking lands in your answer.
+   *
+   * @example
+   * ```ts
+   * for await (const event of ragen.chat.sendStream({ content: "Why?" })) {
+   *   if (event.type === "text") process.stdout.write(event.text);
+   * }
+   * ```
+   */
+  sendStream(
+    params: ChatSendParams,
+    options?: { signal?: AbortSignal },
+  ): AsyncIterable<ChatStreamEvent> {
+    const open = async (): Promise<
+      AsyncIterable<{ text?: unknown; reasoning?: unknown }>
+    > => {
+      const response = await performRequest(this.config.http, {
+        method: "POST",
+        path: "/chat",
+        body: this.buildChatBody(params, true),
+        raw: true,
+        signal: options?.signal,
+      });
+      return parseSSEStream<{ text?: unknown; reasoning?: unknown }>(response);
+    };
+
+    async function* generate(): AsyncGenerator<ChatStreamEvent, void, void> {
+      for await (const raw of await open()) {
+        const event = toStreamEvent(raw);
+        if (event) yield event;
+      }
+    }
+
+    return { [Symbol.asyncIterator]: () => generate() };
+  }
+
+  /**
+   * Convenience: stream a `/v1/chat` reply and return only the answer
+   * text, concatenated. Reasoning events are dropped.
+   */
+  async sendToString(
+    params: ChatSendParams,
+    options?: { signal?: AbortSignal },
+  ): Promise<string> {
+    let out = "";
+    for await (const event of this.sendStream(params, options)) {
+      if (event.type === "text") out += event.text;
+    }
+    return out;
   }
 }

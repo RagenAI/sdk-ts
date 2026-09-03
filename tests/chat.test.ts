@@ -135,3 +135,71 @@ describe("chat.completions.create", () => {
     expect(calls).toHaveLength(2);
   });
 });
+
+describe("chat.completions params newly accepted by the API", () => {
+  it("forwards reasoning_effort and max_completion_tokens", async () => {
+    const { fetch, calls } = makeFetchMock([
+      mockResponse({
+        body: {
+          id: "chatcmpl-1",
+          object: "chat.completion",
+          created: 1,
+          model: "gpt-oss-120b",
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "ok" },
+              finish_reason: "stop",
+              logprobs: null,
+            },
+          ],
+          usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+        },
+      }),
+    ]);
+    const ragen = new Ragen({ apiKey: "sk_test", fetch });
+
+    await ragen.chat.completions.create({
+      assistantId: "11111111-1111-4111-8111-111111111111",
+      messages: [{ role: "user", content: "Hi" }],
+      reasoning_effort: "high",
+      max_completion_tokens: 512,
+    });
+
+    const body = JSON.parse(calls[0]!.init.body as string);
+    expect(body.reasoning_effort).toBe("high");
+    expect(body.max_completion_tokens).toBe(512);
+  });
+
+  it("leaves both out when unset, so the body stays minimal", async () => {
+    const { fetch, calls } = makeFetchMock([
+      mockResponse({
+        body: {
+          id: "chatcmpl-1",
+          object: "chat.completion",
+          created: 1,
+          model: "m",
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "ok" },
+              finish_reason: "stop",
+              logprobs: null,
+            },
+          ],
+          usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+        },
+      }),
+    ]);
+    const ragen = new Ragen({ apiKey: "sk_test", fetch });
+
+    await ragen.chat.completions.create({
+      assistantId: "11111111-1111-4111-8111-111111111111",
+      messages: [{ role: "user", content: "Hi" }],
+    });
+
+    const body = JSON.parse(calls[0]!.init.body as string);
+    expect(body).not.toHaveProperty("reasoning_effort");
+    expect(body).not.toHaveProperty("max_completion_tokens");
+  });
+});
