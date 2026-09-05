@@ -1,0 +1,31 @@
+# CODEOWNERS — sensitive paths that need a named reviewer even when someone else
+# has already approved the PR.
+#
+# GOTCHA: GitHub applies the LAST matching pattern only. A later, broader rule
+# silently overrides an earlier, narrower one — so order matters, and the most
+# specific rules belong at the BOTTOM of this file, not the top.
+
+# Default: anything not matched below.
+*                                       @patrykomiotek
+
+# Release and CI. This package is published to npm from these workflows.
+/.github/workflows/                     @patrykomiotek
+
+# The public API surface. Anything exported here is depended on by real
+# installs and cannot be renamed or removed without a major version bump.
+/src/index.ts                           @patrykomiotek
+
+# Auth, transport and key handling — where an API key could leak.
+/src/utils.ts                           @patrykomiotek
+/src/client.ts                          @patrykomiotek
+
+# Packaging: `files`, `exports` and the build config decide what actually ships
+# in the tarball.
+/package.json                           @patrykomiotek
+/tsup.config.ts                         @patrykomiotek
+
+# Licensing, security policy and this file itself.
+/LICENSE                                @patrykomiotek
+/NOTICE                                 @patrykomiotek
+/SECURITY.md                            @patrykomiotek
+/.github/CODEOWNERS                     @patrykomiotek

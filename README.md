@@ -1,7 +1,7 @@
 # @webamigos/ragen-sdk-ts
 
 [![npm version](https://img.shields.io/npm/v/@webamigos/ragen-sdk-ts.svg)](https://www.npmjs.com/package/@webamigos/ragen-sdk-ts)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
 
 Official TypeScript / JavaScript SDK for **[Ragen.ai](https://ragen.ai)** — the EU-native, GDPR-compliant Retrieval-Augmented Generation platform with an OpenAI-compatible wire format. Use the same shape you already know from `openai`, but with Ragen-specific ergonomics like `assistant_id`, file-processing status, and `waitUntilProcessed()`.
@@ -243,4 +243,5 @@ Full API reference and platform docs at **<https://docs.ragen.ai>**.
 
 ## License
 
-MIT
+Licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for
+attribution requirements.

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **The license changes from MIT to Apache 2.0.** Apache 2.0 adds an express
+  patent grant and requires attribution notices to travel with redistributions
+  — see the new `NOTICE` file. Both `LICENSE` and `NOTICE` now ship inside the
+  npm tarball, which the MIT-licensed 0.1.x releases never did.
+
 - **Breaking**: the package is renamed from `@ragenai/sdk` to
   `@webamigos/ragen-sdk-ts`, matching the `@webamigos` scope the rest of
   the platform uses. Update the dependency and every import:
