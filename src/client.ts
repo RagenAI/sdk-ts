@@ -2,6 +2,7 @@ import { RagenError } from "./errors";
 import { Assistants } from "./resources/assistants";
 import { Chat } from "./resources/chat";
 import { Files } from "./resources/files";
+import { Threads } from "./resources/threads";
 import type { FetchClientConfig } from "./utils";
 
 const DEFAULT_BASE_URL = "https://api.ragen.ai/v1";
@@ -42,6 +43,7 @@ export class Ragen {
   readonly chat: Chat;
   readonly files: Files;
   readonly assistants: Assistants;
+  readonly threads: Threads;
 
   constructor(options: RagenClientOptions = {}) {
     const apiKey =
@@ -73,5 +75,6 @@ export class Ragen {
     this.chat = new Chat({ http, defaultAssistantId: options.assistantId });
     this.files = new Files({ http });
     this.assistants = new Assistants({ http });
+    this.threads = new Threads({ http });
   }
 }

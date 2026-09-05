@@ -5,6 +5,62 @@ All notable changes to `@ragenai/sdk` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `chat.send()`, `chat.sendStream()` and `chat.sendToString()` for
+  Ragen's native `POST /v1/chat`. This endpoint accepts `context` (extra
+  page/document text for embedded chatbots) and separates the model's
+  reasoning deltas from the answer — neither has an equivalent on
+  `/v1/chat/completions`, so both were previously unreachable from the
+  SDK. `sendStream()` yields discriminated `{ type: "text" | "reasoning" }`
+  events.
+- `threads.list()` and `threads.iterate()`. Listing threads is not part
+  of the OpenAI spec, so no OpenAI SDK exposes it. The rest of thread and
+  message CRUD is OpenAI-compatible and deliberately left to the OpenAI
+  SDK rather than duplicated here.
+- `reasoning_effort` and `max_completion_tokens` on
+  `chat.completions.create()` / `.stream()`. Requires an API that accepts
+  them — see the matching `fix(api)` change.
+- Pagination on `assistants.list()`: `limit`, `order`, `after`, `before`.
+  Without them the call silently returned only the first 20 assistants.
+- `Thread`, `ThreadListParams`, `ThreadListResponse`, `ChatSendParams`,
+  `ChatSendResponse`, `ChatStreamEvent`, `ReasoningEffort`,
+  `FilePurpose` and `AssistantListParams` type exports.
+
+### Changed
+
+- **Breaking**: `assistants.list()` now takes `(params?, options?)`
+  instead of `(options?)`, matching `files.list()`. A call written as
+  `assistants.list({ signal })` now reads `signal` as a list param and
+  drops it — move it to the second argument.
+- `Assistant` now types every field the API actually returns
+  (`description`, `model`, `tools`, `tool_resources`, `metadata`,
+  `temperature`, `top_p`, `response_format`); previously only five of
+  thirteen were declared.
+- `AssistantCreateParams` / `AssistantUpdateParams` accept the fields the
+  API tolerates: `description`, `model`, `temperature`, `metadata`,
+  `top_p`.
+- `FileListParams.purpose` narrowed from `string` to
+  `"knowledge_base" | "assistants"` — the API 400s on anything else, so
+  a typo is now a compile error instead of a runtime failure.
+- `parseSSEStream()` is generic over its payload, since `/v1/chat` and
+  `/v1/chat/completions` stream different shapes.
+
+### Fixed
+
+- Error messages from `chat.send*()` are no longer swallowed. `/v1/chat`
+  runs without the OpenAI exception filter and answers in three shapes —
+  `{ error: "<string>", code }`, `{ message }` (an array from the
+  validation pipe) and bare text on its 500 path. The client only read
+  the OpenAI envelope, so every one of them surfaced as "Ragen API
+  request failed with status 404" instead of the real reason. The
+  OpenAI-compatible routes are unaffected and still take precedence.
+- Removed a changelog entry for `models.list()` / `models.retrieve()`.
+  No such resource ships in this SDK, and the API has no `/v1/models`
+  endpoint.
+
 ## [0.1.0] — Unreleased
 
 ### Added
@@ -17,7 +73,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   convenience helpers backed by an SSE async iterator.
 - `files` resource: `upload`, `list`, `retrieve`, `delete`,
   `waitUntilProcessed`, and `uploadAndWait`.
-- `models.list()` and `models.retrieve()`.
 - `assistants` CRUD (`create`, `list`, `retrieve`, `update`, `delete`).
 - Typed error hierarchy: `RagenError`, `RagenAuthError`,
   `RagenPermissionError`, `RagenNotFoundError`, `RagenRateLimitError`,

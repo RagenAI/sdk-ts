@@ -9,6 +9,11 @@ export type ChatCompletionRole = "system" | "user" | "assistant";
 export interface ChatCompletionMessageParam {
   role: ChatCompletionRole;
   content: string;
+  /**
+   * OpenAI's optional author name. Needs an API that whitelists it —
+   * deployments older than the chat-completion param fix reject the
+   * whole request with a 400 rather than ignoring the field.
+   */
   name?: string;
 }
 
@@ -63,6 +68,8 @@ export interface ChatCompletionStreamOptions {
   include_usage?: boolean;
 }
 
+export type ReasoningEffort = "low" | "medium" | "high";
+
 export interface ChatCompletionCreateParamsBase {
   /** Required if no default `assistantId` is set on the client. */
   assistantId?: string;
@@ -70,6 +77,13 @@ export interface ChatCompletionCreateParamsBase {
   model?: string;
   temperature?: number;
   max_tokens?: number;
+  /** OpenAI's newer name for `max_tokens`. `max_tokens` wins if both are set. */
+  max_completion_tokens?: number;
+  /**
+   * Forwarded to the model. Only reasoning-capable models act on it;
+   * those default to `"medium"` server-side when this is omitted.
+   */
+  reasoning_effort?: ReasoningEffort;
 }
 
 export interface ChatCompletionCreateParamsNonStreaming extends ChatCompletionCreateParamsBase {
@@ -104,10 +118,13 @@ export interface FileObject {
   status_details: string | null;
 }
 
+export type FilePurpose = "knowledge_base" | "assistants";
+
 export interface FileListParams {
   limit?: number;
   after?: string;
-  purpose?: string;
+  /** The API validates this against a fixed set and 400s on anything else. */
+  purpose?: FilePurpose;
 }
 
 export interface FileListResponse {
@@ -117,7 +134,7 @@ export interface FileListResponse {
 
 export interface FileUploadParams {
   filename?: string;
-  purpose?: "knowledge_base" | "assistants";
+  purpose?: FilePurpose;
 }
 
 export interface FileDeletedResponse {
@@ -142,17 +159,45 @@ export interface Assistant {
   object: "assistant";
   created_at: number;
   name: string;
+  description: string | null;
+  model: string;
   instructions: string | null;
+  tools: Array<{ type: "file_search" }>;
+  tool_resources: Record<string, never>;
+  metadata: Record<string, never>;
+  temperature: number;
+  top_p: number;
+  response_format: "auto";
 }
 
-export interface AssistantCreateParams {
+/**
+ * Fields the API accepts but does not persist yet — it echoes constants
+ * back on read. Declared so an OpenAI-shaped payload validates.
+ */
+interface AssistantWriteExtras {
+  description?: string;
+  model?: string;
+  temperature?: number;
+  metadata?: Record<string, unknown>;
+  top_p?: number;
+}
+
+export interface AssistantCreateParams extends AssistantWriteExtras {
   name: string;
   instructions?: string;
 }
 
-export interface AssistantUpdateParams {
+export interface AssistantUpdateParams extends AssistantWriteExtras {
   name?: string;
   instructions?: string;
+}
+
+export interface AssistantListParams {
+  /** 1–100. The API defaults to 20, so omitting this caps the page at 20. */
+  limit?: number;
+  order?: "asc" | "desc";
+  after?: string;
+  before?: string;
 }
 
 export interface AssistantListResponse {
@@ -175,4 +220,69 @@ export interface APIErrorBody {
     code: string | null;
     param: string | null;
   };
+}
+
+// --- Native chat (`POST /v1/chat`) -----------------------------------------
+
+/**
+ * Ragen's own chat endpoint, which predates the OpenAI-compatible one.
+ * It stays in the SDK because two of its inputs have no equivalent on
+ * `/v1/chat/completions`: `context` and, in the stream, reasoning
+ * deltas separated from the answer.
+ */
+export interface ChatSendParams {
+  /** Required if no default `assistantId` is set on the client. */
+  assistantId?: string;
+  /** The user's message. 1–10,000 characters. */
+  content: string;
+  /**
+   * Extra page or document context, up to 20,000 characters. Appended
+   * to the question server-side — meant for embedded chatbots passing
+   * the page they're on. No equivalent on `/v1/chat/completions`.
+   */
+  context?: string;
+  reasoning_effort?: ReasoningEffort;
+}
+
+export interface ChatSendResponse {
+  text: string;
+}
+
+/**
+ * One event from `sendStream()`. The endpoint interleaves answer text
+ * with the model's intermediate reasoning on a single stream; the
+ * discriminant keeps callers from concatenating the two into one blob.
+ */
+export type ChatStreamEvent =
+  | { type: "text"; text: string }
+  | { type: "reasoning"; reasoning: string };
+
+// --- Threads ---------------------------------------------------------------
+
+/**
+ * A thread as `GET /v1/threads` returns it: the OpenAI `thread` shape
+ * plus Ragen's `title` and `assistant_id`.
+ */
+export interface Thread {
+  id: string;
+  object: "thread";
+  created_at: number;
+  tool_resources: Record<string, never>;
+  metadata: Record<string, never>;
+  /** Ragen extension — the title shown in the dashboard sidebar. */
+  title: string | null;
+  /** Ragen extension — `asst-<projectId>` the thread is bound to. */
+  assistant_id: string | null;
+}
+
+export interface ThreadListParams {
+  /** 1–100. The API defaults to 20, so omitting this caps the page at 20. */
+  limit?: number;
+  order?: "asc" | "desc";
+  after?: string;
+}
+
+export interface ThreadListResponse {
+  object: "list";
+  data: Thread[];
 }

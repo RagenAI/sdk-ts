@@ -76,3 +76,37 @@ describe("assistants", () => {
     expect(out.object).toBe("assistant.deleted");
   });
 });
+
+describe("assistants.list pagination", () => {
+  it("passes limit, order, after and before as query params", async () => {
+    const { fetch, calls } = makeFetchMock([
+      mockResponse({ body: { object: "list", data: [] } }),
+    ]);
+    const ragen = new Ragen({ apiKey: "sk_test", fetch });
+
+    await ragen.assistants.list({
+      limit: 100,
+      order: "asc",
+      after: "asst-a",
+      before: "asst-z",
+    });
+
+    const url = new URL(calls[0]!.url);
+    expect(url.pathname).toBe("/v1/assistants");
+    expect(url.searchParams.get("limit")).toBe("100");
+    expect(url.searchParams.get("order")).toBe("asc");
+    expect(url.searchParams.get("after")).toBe("asst-a");
+    expect(url.searchParams.get("before")).toBe("asst-z");
+  });
+
+  it("sends no query string when called with no params", async () => {
+    const { fetch, calls } = makeFetchMock([
+      mockResponse({ body: { object: "list", data: [] } }),
+    ]);
+    const ragen = new Ragen({ apiKey: "sk_test", fetch });
+
+    await ragen.assistants.list();
+
+    expect(calls[0]!.url).toBe("https://api.ragen.ai/v1/assistants");
+  });
+});
