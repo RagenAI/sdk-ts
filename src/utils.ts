@@ -1,5 +1,4 @@
 import { errorFromResponse, RagenError } from "./errors";
-import type { APIErrorBody } from "./types";
 
 export interface RequestOptions {
   method: "GET" | "POST" | "DELETE" | "PATCH";
@@ -113,11 +112,12 @@ export async function performRequest(
       }
 
       if (!response.ok) {
-        const errorBody = await parseErrorBody(response);
+        const { parsed, text } = await parseErrorBody(response);
         throw errorFromResponse(
           response.status,
-          errorBody,
+          parsed,
           `Ragen API request failed with status ${response.status}`,
+          text,
         );
       }
 
@@ -154,13 +154,25 @@ export async function performRequest(
   );
 }
 
-async function parseErrorBody(response: Response): Promise<APIErrorBody | null> {
+/**
+ * Read an error body once, returning both the decoded JSON (when it is
+ * JSON) and the raw text. Ragen's native `/v1/chat` answers with plain
+ * text on its 500 path, and that text is the only detail available.
+ */
+async function parseErrorBody(
+  response: Response,
+): Promise<{ parsed: unknown; text: string }> {
+  let text = "";
   try {
-    const text = await response.text();
-    if (!text) return null;
-    return JSON.parse(text) as APIErrorBody;
+    text = await response.text();
   } catch {
-    return null;
+    return { parsed: null, text: "" };
+  }
+  if (!text) return { parsed: null, text: "" };
+  try {
+    return { parsed: JSON.parse(text), text };
+  } catch {
+    return { parsed: null, text };
   }
 }
 

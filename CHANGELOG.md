@@ -50,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Error messages from `chat.send*()` are no longer swallowed. `/v1/chat`
+  runs without the OpenAI exception filter and answers in three shapes —
+  `{ error: "<string>", code }`, `{ message }` (an array from the
+  validation pipe) and bare text on its 500 path. The client only read
+  the OpenAI envelope, so every one of them surfaced as "Ragen API
+  request failed with status 404" instead of the real reason. The
+  OpenAI-compatible routes are unaffected and still take precedence.
 - Removed a changelog entry for `models.list()` / `models.retrieve()`.
   No such resource ships in this SDK, and the API has no `/v1/models`
   endpoint.
