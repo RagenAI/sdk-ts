@@ -48,6 +48,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"examples/**/*.ts\"",
+    "verify": "pnpm type-check && pnpm lint && pnpm test && pnpm build",
     "commit": "cz",
     "prepare": "husky",
     "prepublishOnly": "pnpm build"
