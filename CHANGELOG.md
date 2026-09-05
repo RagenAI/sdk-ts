@@ -5,14 +5,21 @@ All notable changes to `@webamigos/ragen-sdk-ts` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] — 2026-09-06
+## [0.2.1] — 2026-09-06
 
 ### Changed
 
 - **The license changes from MIT to Apache 2.0.** Apache 2.0 adds an express
   patent grant and requires attribution notices to travel with redistributions
   — see the new `NOTICE` file. Both `LICENSE` and `NOTICE` now ship inside the
-  npm tarball, which the MIT-licensed 0.1.x releases never did.
+  npm tarball, which no previous release ever carried.
+
+  0.2.0 went out declaring MIT by mistake, and npm version metadata is
+  immutable — this release is the correction. Treat 0.2.0 as withdrawn.
+
+## [0.2.0] — 2026-09-06
+
+### Changed
 
 - **Breaking**: the package is renamed from `@ragenai/sdk` to
   `@webamigos/ragen-sdk-ts`, matching the `@webamigos` scope the rest of
