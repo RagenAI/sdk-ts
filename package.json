@@ -1,5 +1,5 @@
 {
-  "name": "@ragenai/sdk",
+  "name": "@webamigos/ragen-sdk-ts",
   "version": "0.1.2",
   "description": "TypeScript SDK for Ragen.ai — EU-native RAG platform",
   "license": "MIT",

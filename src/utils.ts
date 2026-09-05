@@ -70,7 +70,7 @@ export async function performRequest(
   const headers: Record<string, string> = {
     Authorization: `Bearer ${config.apiKey}`,
     Accept: "application/json",
-    "User-Agent": "@ragenai/sdk",
+    "User-Agent": "@webamigos/ragen-sdk-ts",
   };
 
   let body: BodyInit | undefined;

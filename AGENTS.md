@@ -4,7 +4,7 @@ Guidance for AI coding agents (Claude Code, Codex, Cursor, etc.) working in this
 
 ## What this is
 
-`@ragenai/sdk` — official TypeScript SDK for [Ragen.ai](https://ragen.ai), an EU-native, GDPR-compliant RAG platform with an OpenAI-compatible wire format.
+`@webamigos/ragen-sdk-ts` — official TypeScript SDK for [Ragen.ai](https://ragen.ai), an EU-native, GDPR-compliant RAG platform with an OpenAI-compatible wire format.
 
 Zero runtime dependencies. Runs on Node ≥18, browsers, and edge runtimes.
 

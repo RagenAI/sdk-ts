@@ -1,6 +1,6 @@
-# @ragenai/sdk
+# @webamigos/ragen-sdk-ts
 
-[![npm version](https://img.shields.io/npm/v/@ragenai/sdk.svg)](https://www.npmjs.com/package/@ragenai/sdk)
+[![npm version](https://img.shields.io/npm/v/@webamigos/ragen-sdk-ts.svg)](https://www.npmjs.com/package/@webamigos/ragen-sdk-ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
 
@@ -9,11 +9,11 @@ Official TypeScript / JavaScript SDK for **[Ragen.ai](https://ragen.ai)** — th
 ## Installation
 
 ```bash
-npm install @ragenai/sdk
+npm install @webamigos/ragen-sdk-ts
 # or
-pnpm add @ragenai/sdk
+pnpm add @webamigos/ragen-sdk-ts
 # or
-yarn add @ragenai/sdk
+yarn add @webamigos/ragen-sdk-ts
 ```
 
 Requires Node.js 18+ (for built-in `fetch`, `FormData`, and `ReadableStream`).
@@ -21,7 +21,7 @@ Requires Node.js 18+ (for built-in `fetch`, `FormData`, and `ReadableStream`).
 ## Quick start
 
 ```ts
-import { Ragen } from "@ragenai/sdk";
+import { Ragen } from "@webamigos/ragen-sdk-ts";
 
 const ragen = new Ragen({ apiKey: process.env.RAGEN_API_KEY });
 
@@ -191,7 +191,7 @@ import {
   RagenRateLimitError,
   RagenAPIError,
   RagenError,
-} from "@ragenai/sdk";
+} from "@webamigos/ragen-sdk-ts";
 
 try {
   await ragen.chat.completions.create({

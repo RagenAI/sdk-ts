@@ -1,9 +1,9 @@
 ---
 name: ragen-sdk-release
-description: Cut a release of @ragenai/sdk — decide the version bump from what actually changed for consumers, then tag so the publish workflow runs. Use when publishing to npm, bumping the version, or judging whether a change is breaking. Triggers on "release", "publish", "version bump", "wydaj nową wersję".
+description: Cut a release of @webamigos/ragen-sdk-ts — decide the version bump from what actually changed for consumers, then tag so the publish workflow runs. Use when publishing to npm, bumping the version, or judging whether a change is breaking. Triggers on "release", "publish", "version bump", "wydaj nową wersję".
 ---
 
-# Releasing `@ragenai/sdk`
+# Releasing `@webamigos/ragen-sdk-ts`
 
 Publishing is tag-driven. Pushing a `v*` tag runs `.github/workflows/release.yml`, which installs with a frozen lockfile, runs type-check + test + build, **verifies the tag matches `package.json` version**, publishes with npm provenance, and creates a GitHub release.
 
@@ -60,7 +60,7 @@ Watch the run. A failure after the publish step means the package is on npm but 
 ## 5. After it lands
 
 ```bash
-npm view @ragenai/sdk version
+npm view @webamigos/ragen-sdk-ts version
 ```
 
 Confirm the version and that provenance is attached. `NPM_TOKEN` must be a valid repo secret; publishing fails at the last step if it has expired.

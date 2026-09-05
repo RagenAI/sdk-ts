@@ -5,7 +5,7 @@
  * `POST`s `{ messages }` and receives an SSE stream proxied straight from
  * Ragen.
  */
-import { Ragen } from "@ragenai/sdk";
+import { Ragen } from "@webamigos/ragen-sdk-ts";
 
 export const runtime = "edge";
 
