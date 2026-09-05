@@ -29,7 +29,7 @@ export interface RagenClientOptions {
  *
  * @example
  * ```ts
- * import { Ragen } from "@ragenai/sdk";
+ * import { Ragen } from "@webamigos/ragen-sdk-ts";
  *
  * const ragen = new Ragen({ apiKey: process.env.RAGEN_API_KEY });
  *

@@ -84,7 +84,9 @@ describe("chat.completions.stream", () => {
     const parts = [full.slice(0, 10), full.slice(10, 35), full.slice(35)];
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        for (const p of parts) controller.enqueue(encoder.encode(p));
+        for (const p of parts) {
+          controller.enqueue(encoder.encode(p));
+        }
         controller.close();
       },
     });

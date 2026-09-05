@@ -59,10 +59,16 @@ export class Threads {
 
     while (true) {
       const page = await this.list({ ...params, limit, after }, options);
-      for (const thread of page.data) yield thread;
-      if (page.data.length < limit) return;
+      for (const thread of page.data) {
+        yield thread;
+      }
+      if (page.data.length < limit) {
+        return;
+      }
       after = page.data[page.data.length - 1]?.id;
-      if (!after) return;
+      if (!after) {
+        return;
+      }
     }
   }
 }

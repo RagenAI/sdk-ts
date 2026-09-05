@@ -1,5 +1,5 @@
 /**
- * @ragenai/sdk — Official TypeScript SDK for Ragen.ai
+ * @webamigos/ragen-sdk-ts — Official TypeScript SDK for Ragen.ai
  *
  * EU-native, GDPR-compliant RAG platform with an OpenAI-compatible wire format.
  */
@@ -65,5 +65,5 @@ export type {
   APIErrorBody,
 } from "./types";
 
-// Default export so `import Ragen from "@ragenai/sdk"` also works.
+// Default export so `import Ragen from "@webamigos/ragen-sdk-ts"` also works.
 export { Ragen as default } from "./client";

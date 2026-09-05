@@ -26,7 +26,9 @@ export async function* parseSSEStream<T = ChatCompletionChunk>(
   try {
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done) {
+        break;
+      }
       buffer += decoder.decode(value, { stream: true });
 
       // SSE events are separated by blank lines (\n\n). Process complete events
@@ -36,15 +38,21 @@ export async function* parseSSEStream<T = ChatCompletionChunk>(
         const rawEvent = buffer.slice(0, separatorIndex);
         buffer = buffer.slice(separatorIndex + (buffer[separatorIndex] === "\r" ? 4 : 2));
         const chunk = parseEvent<T>(rawEvent);
-        if (chunk === "DONE") return;
-        if (chunk !== null) yield chunk;
+        if (chunk === "DONE") {
+          return;
+        }
+        if (chunk !== null) {
+          yield chunk;
+        }
       }
     }
     // Flush any final event without trailing blank line.
     const tail = buffer.trim();
     if (tail) {
       const chunk = parseEvent<T>(tail);
-      if (chunk !== "DONE" && chunk !== null) yield chunk;
+      if (chunk !== "DONE" && chunk !== null) {
+        yield chunk;
+      }
     }
   } finally {
     reader.releaseLock();
@@ -54,8 +62,12 @@ export async function* parseSSEStream<T = ChatCompletionChunk>(
 function indexOfDoubleNewline(buffer: string): number {
   const lf = buffer.indexOf("\n\n");
   const crlf = buffer.indexOf("\r\n\r\n");
-  if (lf === -1) return crlf;
-  if (crlf === -1) return lf;
+  if (lf === -1) {
+    return crlf;
+  }
+  if (crlf === -1) {
+    return lf;
+  }
   return Math.min(lf, crlf);
 }
 
@@ -63,14 +75,20 @@ function parseEvent<T>(raw: string): T | "DONE" | null {
   const lines = raw.split(/\r?\n/);
   const dataLines: string[] = [];
   for (const line of lines) {
-    if (!line || line.startsWith(":")) continue;
+    if (!line || line.startsWith(":")) {
+      continue;
+    }
     if (line.startsWith("data:")) {
       dataLines.push(line.slice(5).replace(/^ /, ""));
     }
   }
-  if (dataLines.length === 0) return null;
+  if (dataLines.length === 0) {
+    return null;
+  }
   const payload = dataLines.join("\n");
-  if (payload === "[DONE]") return "DONE";
+  if (payload === "[DONE]") {
+    return "DONE";
+  }
   try {
     return JSON.parse(payload) as T;
   } catch {

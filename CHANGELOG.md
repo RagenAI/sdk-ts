@@ -1,11 +1,30 @@
 # Changelog
 
-All notable changes to `@ragenai/sdk` are documented here.
+All notable changes to `@webamigos/ragen-sdk-ts` are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+
+- **Breaking**: the package is renamed from `@ragenai/sdk` to
+  `@webamigos/ragen-sdk-ts`, matching the `@webamigos` scope the rest of
+  the platform uses. Update the dependency and every import:
+
+  ```diff
+  - import { Ragen } from "@ragenai/sdk";
+  + import { Ragen } from "@webamigos/ragen-sdk-ts";
+  ```
+
+  Nothing about the API changes — only the name it is installed and
+  imported under. `@ragenai/sdk` stops receiving updates at 0.1.2; it is
+  not a dist-tag alias, so a pinned dependency keeps resolving to the old
+  package until it is changed.
+- The `User-Agent` sent with every request becomes
+  `@webamigos/ragen-sdk-ts`. Anything filtering API logs or analytics on
+  the old value needs updating.
 
 ### Added
 

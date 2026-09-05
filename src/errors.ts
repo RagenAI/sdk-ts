@@ -180,10 +180,20 @@ export function errorFromResponse(
     param: err.param ?? null,
     type: err.type ?? "api_error",
   };
-  if (status === 401) return new RagenAuthError(message, opts);
-  if (status === 403) return new RagenPermissionError(message, opts);
-  if (status === 404) return new RagenNotFoundError(message, opts);
-  if (status === 429) return new RagenRateLimitError(message, opts);
-  if (status >= 500) return new RagenAPIError(message, opts);
+  if (status === 401) {
+    return new RagenAuthError(message, opts);
+  }
+  if (status === 403) {
+    return new RagenPermissionError(message, opts);
+  }
+  if (status === 404) {
+    return new RagenNotFoundError(message, opts);
+  }
+  if (status === 429) {
+    return new RagenRateLimitError(message, opts);
+  }
+  if (status >= 500) {
+    return new RagenAPIError(message, opts);
+  }
   return new RagenError(message, opts);
 }

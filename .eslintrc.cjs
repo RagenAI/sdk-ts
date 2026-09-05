@@ -7,10 +7,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint"],
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-  ],
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   env: {
     node: true,
     browser: true,
@@ -25,6 +22,10 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/consistent-type-imports": "warn",
     "no-constant-condition": ["error", { checkLoops: false }],
+    // Always brace control statements. A single-line body reads fine until
+    // someone adds a second statement under it and the indentation lies
+    // about what the branch covers.
+    curly: ["error", "all"],
   },
   overrides: [
     {
