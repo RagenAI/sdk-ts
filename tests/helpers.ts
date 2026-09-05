@@ -43,7 +43,9 @@ export function makeFetchMock(
     const url = typeof input === "string" ? input : input.toString();
     calls.push({ url, init: init ?? {} });
     const next = responses[i++];
-    if (!next) throw new Error(`Unexpected fetch call #${i} to ${url}`);
+    if (!next) {
+      throw new Error(`Unexpected fetch call #${i} to ${url}`);
+    }
     return typeof next === "function" ? await next() : next;
   });
   return { fetch: fn as unknown as typeof fetch, calls };

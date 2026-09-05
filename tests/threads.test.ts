@@ -67,7 +67,9 @@ describe("threads.iterate", () => {
     const ragen = new Ragen({ apiKey: "sk_test", fetch });
 
     const ids = [];
-    for await (const t of ragen.threads.iterate({ limit: 2 })) ids.push(t.id);
+    for await (const t of ragen.threads.iterate({ limit: 2 })) {
+      ids.push(t.id);
+    }
 
     expect(ids).toEqual(["thread-1", "thread-2", "thread-3"]);
     expect(calls).toHaveLength(2);
@@ -82,7 +84,9 @@ describe("threads.iterate", () => {
     const ragen = new Ragen({ apiKey: "sk_test", fetch });
 
     const ids = [];
-    for await (const t of ragen.threads.iterate({ limit: 10 })) ids.push(t.id);
+    for await (const t of ragen.threads.iterate({ limit: 10 })) {
+      ids.push(t.id);
+    }
 
     expect(ids).toEqual(["thread-1"]);
     expect(calls).toHaveLength(1);
@@ -95,7 +99,9 @@ describe("threads.iterate", () => {
     const ragen = new Ragen({ apiKey: "sk_test", fetch });
 
     const ids = [];
-    for await (const t of ragen.threads.iterate({ limit: 5 })) ids.push(t.id);
+    for await (const t of ragen.threads.iterate({ limit: 5 })) {
+      ids.push(t.id);
+    }
 
     expect(ids).toEqual([]);
     expect(calls).toHaveLength(1);
