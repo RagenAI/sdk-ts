@@ -50,9 +50,15 @@ function buildBody(
     messages: params.messages,
     ...extras,
   };
-  if (params.model !== undefined) body.model = params.model;
-  if (params.temperature !== undefined) body.temperature = params.temperature;
-  if (params.max_tokens !== undefined) body.max_tokens = params.max_tokens;
+  if (params.model !== undefined) {
+    body.model = params.model;
+  }
+  if (params.temperature !== undefined) {
+    body.temperature = params.temperature;
+  }
+  if (params.max_tokens !== undefined) {
+    body.max_tokens = params.max_tokens;
+  }
   if (params.max_completion_tokens !== undefined) {
     body.max_completion_tokens = params.max_completion_tokens;
   }
@@ -71,7 +77,9 @@ function toStreamEvent(raw: {
   text?: unknown;
   reasoning?: unknown;
 }): ChatStreamEvent | null {
-  if (typeof raw.text === "string") return { type: "text", text: raw.text };
+  if (typeof raw.text === "string") {
+    return { type: "text", text: raw.text };
+  }
   if (typeof raw.reasoning === "string") {
     return { type: "reasoning", reasoning: raw.reasoning };
   }
@@ -130,7 +138,9 @@ export class ChatCompletions {
 
     async function* generate(): AsyncGenerator<ChatCompletionChunk, void, void> {
       const iterable = await open();
-      for await (const chunk of iterable) yield chunk;
+      for await (const chunk of iterable) {
+        yield chunk;
+      }
     }
 
     return { [Symbol.asyncIterator]: () => generate() };
@@ -148,7 +158,9 @@ export class ChatCompletions {
     let out = "";
     for await (const chunk of iter) {
       const piece = chunk.choices[0]?.delta?.content;
-      if (piece) out += piece;
+      if (piece) {
+        out += piece;
+      }
     }
     return out;
   }
@@ -158,7 +170,9 @@ export class ChatCompletions {
     options?: { signal?: AbortSignal },
   ): Promise<AsyncIterable<ChatCompletionChunk>> {
     const extras: Record<string, unknown> = { stream: true };
-    if (params.stream_options) extras.stream_options = params.stream_options;
+    if (params.stream_options) {
+      extras.stream_options = params.stream_options;
+    }
     const body = buildBody(params, this.config.defaultAssistantId, extras);
     const response = await performRequest(this.config.http, {
       method: "POST",
@@ -202,7 +216,9 @@ export class Chat {
       content: params.content,
       stream,
     };
-    if (params.context !== undefined) body.context = params.context;
+    if (params.context !== undefined) {
+      body.context = params.context;
+    }
     if (params.reasoning_effort !== undefined) {
       body.reasoning_effort = params.reasoning_effort;
     }
@@ -267,7 +283,9 @@ export class Chat {
     async function* generate(): AsyncGenerator<ChatStreamEvent, void, void> {
       for await (const raw of await open()) {
         const event = toStreamEvent(raw);
-        if (event) yield event;
+        if (event) {
+          yield event;
+        }
       }
     }
 
@@ -284,7 +302,9 @@ export class Chat {
   ): Promise<string> {
     let out = "";
     for await (const event of this.sendStream(params, options)) {
-      if (event.type === "text") out += event.text;
+      if (event.type === "text") {
+        out += event.text;
+      }
     }
     return out;
   }

@@ -40,7 +40,9 @@ function buildUrl(
   const trimmedBase = baseURL.replace(/\/$/, "");
   const trimmedPath = path.startsWith("/") ? path : `/${path}`;
   const url = `${trimmedBase}${trimmedPath}`;
-  if (!query) return url;
+  if (!query) {
+    return url;
+  }
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined && value !== null) {
@@ -125,7 +127,9 @@ export async function performRequest(
     } catch (err) {
       lastError = err;
       // Network errors / aborts → retry while attempts remain.
-      if (err instanceof RagenError) throw err;
+      if (err instanceof RagenError) {
+        throw err;
+      }
       if (attempt < maxAttempts - 1) {
         await sleep(backoffDelay(attempt));
         continue;
@@ -168,7 +172,9 @@ async function parseErrorBody(
   } catch {
     return { parsed: null, text: "" };
   }
-  if (!text) return { parsed: null, text: "" };
+  if (!text) {
+    return { parsed: null, text: "" };
+  }
   try {
     return { parsed: JSON.parse(text), text };
   } catch {

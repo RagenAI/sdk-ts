@@ -29,7 +29,9 @@ export async function POST(req: Request): Promise<Response> {
       try {
         for await (const chunk of stream) {
           const piece = chunk.choices[0]?.delta?.content;
-          if (piece) controller.enqueue(encoder.encode(piece));
+          if (piece) {
+            controller.enqueue(encoder.encode(piece));
+          }
         }
         controller.close();
       } catch (err) {

@@ -123,7 +123,9 @@ export class Files {
 
     while (true) {
       const file = await this.retrieve(id, { signal: options.signal });
-      if (file.status === "processed") return file;
+      if (file.status === "processed") {
+        return file;
+      }
       if (file.status === "error") {
         throw new RagenError(
           `File ${id} failed processing${file.status_details ? `: ${file.status_details}` : ""}`,
