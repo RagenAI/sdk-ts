@@ -5,6 +5,20 @@ All notable changes to `@webamigos/ragen-sdk-ts` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] — 2026-09-06
+
+### Changed
+
+- Maintenance only — no change to the published code. `dist/` is byte-for-byte
+  what 0.2.1 shipped; nothing under `src/` was touched. This release exists to
+  exercise the publish pipeline on upgraded GitHub Actions
+  (`checkout` 4→7, `setup-node` 4→7, `pnpm/action-setup` 4→6,
+  `action-gh-release` 2→3), which CI cannot cover because the release workflow
+  only runs on a tag.
+- Development dependencies: `@types/node` 20→26, plus transitive updates.
+  `commitlint` and `lint-staged` were deliberately held back — their current
+  majors require Node ≥22, and this package supports Node ≥18.
+
 ## [0.2.1] — 2026-09-06
 
 ### Changed
