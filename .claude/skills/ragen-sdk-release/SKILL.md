@@ -55,6 +55,15 @@ npm version <patch|minor|major> -m "%s"    # bumps package.json and commits
 git push && git push --tags
 ```
 
+Before pushing the tag, check what will actually be frozen into the registry — `license`, the file list, the name — rather than what you meant to ship:
+
+```bash
+pnpm build && npm pack --dry-run --json | jq '.[0] | {name, version, files: [.files[].path]}'
+node -p "require('./package.json').license"
+```
+
+`LICENSE` and `NOTICE` must appear in that file list; they only ship if `files` names them.
+
 Watch the run. A failure after the publish step means the package is on npm but the GitHub release is missing — fix forward, never republish a version.
 
 ## 5. After it lands
@@ -68,6 +77,7 @@ Confirm the version and that provenance is attached. `NPM_TOKEN` must be a valid
 ## Do not
 
 - **Don't publish from a laptop.** The workflow is the only path that attaches provenance, and a local publish makes the next tagged run collide with an existing version.
-- **Don't retag.** npm versions are immutable; moving a tag desynchronizes the GitHub release from what was published. Cut the next patch instead.
+- **Don't re-run a failed run after changing what the release contains.** A re-run replays the commit that run was created for — it ignores the branch and ignores a tag you have since moved. Re-running is only safe when the failure was purely environmental and the content is unchanged; otherwise delete the tag, recreate it on the commit you want, and push it to start a fresh run. This mistake published a version under the wrong license, and npm metadata cannot be edited afterwards: `docs/lessons/re-running-a-workflow-replays-its-original-commit.md`.
+- **Don't retag a version that already published.** npm versions are immutable; moving a tag desynchronizes the GitHub release from what was published. Cut the next patch instead. (Moving a tag whose publish never succeeded is fine — nothing is on the registry yet.)
 - **Don't tag with a dirty tree or an unmerged branch.** The workflow builds from the tag, not from your working copy.
 - **Don't ship an SDK feature ahead of its server change.** It types cleanly and 400s for every user.
