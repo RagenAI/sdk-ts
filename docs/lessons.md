@@ -26,6 +26,10 @@ Write the rule so it holds after the specific bug is forgotten. "Check the DTO, 
 - [A param the server DTO does not declare rejects the whole request](lessons/forbidnonwhitelisted-makes-an-undeclared-param-a-400.md) — area:integration; module:types,chat,assistants; topic:api-contracts,validation,type-safety. `forbidNonWhitelisted` means an extra field is fatal, not ignored — so an SDK type advertising a field the DTO lacks guarantees a 400.
 - [A `list()` that forwards no pagination params silently returns the server default and looks complete](lessons/a-list-method-without-pagination-params-looks-complete.md) — area:integration; module:assistants,threads,files; topic:pagination,api-contracts,silent-truncation. Also the case for treating a source-compatible signature change as breaking.
 
+### release
+
+- [Re-running a workflow run replays its original commit — moving the tag afterwards changes nothing](lessons/re-running-a-workflow-replays-its-original-commit.md) — area:release; module:ci,release; topic:github-actions,npm,publishing,immutability,tags. Published 0.2.0 to npm declaring the wrong license, which npm's immutable version metadata made uncorrectable; the fix was a new version plus `npm deprecate`.
+
 ### documentation
 
 - [The changelog announced a resource that exists in neither the SDK nor the API](lessons/the-changelog-promised-a-resource-that-never-shipped.md) — area:documentation; module:docs; topic:docs-drift,changelog,public-surface. `AGENTS.md` forbade the resource while `CHANGELOG.md` claimed it shipped; both were being read.
